@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17
+    container_name: db-bigchatbr
+    environment:
+      POSTGRES_DB: db_bigchatbr
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: api-bigchatbr
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db_bigchatbr
+      SPRING_DATASOURCE_USERNAME: api_user
+      SPRING_DATASOURCE_PASSWORD: api_pass
+      API_SECURITY_TOKEN_SECRET: now-you-see-me
+    depends_on:
+      - db
+
+volumes:
+  db-data:

@@ -19,6 +19,10 @@ public class ValidDocumentValidator implements ConstraintValidator<ValidDocument
             Object docIdObj = documentIdField.get(object);
             Object docTypeObj = documentTypeField.get(object);
 
+            // Se ambos os campos forem nulos, o objeto é considerado válido
+            if (docIdObj == null && docTypeObj == null) {
+                return true;
+            }
             // Verifica se os campos documentId e documentType não são nulos
             // para ser valido é preciso ter os dois campos preenchidos
             if (docIdObj == null || docTypeObj == null) {

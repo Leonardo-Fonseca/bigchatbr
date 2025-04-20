@@ -1,0 +1,8 @@
+{
+  "conversationId": 1,
+  "senderId": 2,
+  "recipientId": 1,
+  "content": "Mensagem de teste automatizada",
+  "priority": "URGENT",
+  "status": "SENT"
+}

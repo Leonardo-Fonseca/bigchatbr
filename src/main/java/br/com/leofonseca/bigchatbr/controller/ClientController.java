@@ -23,8 +23,12 @@ public class ClientController {
     public ResponseEntity<ClientResponseDTO> createClient(
             @RequestBody @Valid  ClientCreateRequestDTO request
     ) {
-        ClientResponseDTO response = clientService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        try {
+            ClientResponseDTO response = clientService.create(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -32,22 +36,34 @@ public class ClientController {
             @PathVariable("id") Long id,
             @RequestBody @Valid ClientUpdateRequestDTO request
     ) {
-        ClientResponseDTO response = clientService.update(id, request);
-        return ResponseEntity.ok(response);
+        try {
+            ClientResponseDTO response = clientService.update(id, request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<ClientResponseDTO>> getAllClients() {
-        List<ClientResponseDTO> response = clientService.list();
-        return ResponseEntity.ok(response);
+        try {
+            List<ClientResponseDTO> response = clientService.list();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao listar clientes", e);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> getClientById(
             @PathVariable("id") Long id
     ) {
-        ClientResponseDTO response = clientService.findById(id);
-        return ResponseEntity.ok(response);
+        try {
+            ClientResponseDTO response = clientService.findById(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

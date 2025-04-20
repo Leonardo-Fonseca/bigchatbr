@@ -5,7 +5,6 @@ import br.com.leofonseca.bigchatbr.domain.conversation.Conversation;
 import br.com.leofonseca.bigchatbr.domain.conversation.ConversationResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.Message;
 import br.com.leofonseca.bigchatbr.domain.message.MessageRequestDTO;
-import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
 import br.com.leofonseca.bigchatbr.repository.ConversationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

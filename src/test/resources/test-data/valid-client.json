@@ -1,0 +1,9 @@
+{
+  "documentId": "99988877711",
+  "name": "Teste Client",
+  "documentType": "CPF",
+  "planType": "PREPAID",
+  "password": "Senha-teste",
+  "balance": 100,
+  "isActive": true
+}

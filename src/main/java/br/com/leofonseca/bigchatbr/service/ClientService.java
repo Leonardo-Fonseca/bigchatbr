@@ -6,11 +6,9 @@ import br.com.leofonseca.bigchatbr.domain.user.User;
 import br.com.leofonseca.bigchatbr.repository.ClientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -79,4 +77,13 @@ public class ClientService {
         return clientRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
     }
+
+    public void saveClient(Client client) {
+        clientRepository.save(client);
+    }
+
+    public ClientBalanceDTO getBalanceById(Long id) {
+        return new ClientBalanceDTO(this.findClientById(id).getBalance());
+    }
+
 }

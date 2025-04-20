@@ -8,11 +8,11 @@ SELECT t.* FROM (
 ) t
 WHERE NOT EXISTS (SELECT 1 FROM users);
 
-INSERT INTO clients (id, name, document_id, document_type, plan_type, balance, id_user, is_active, created_at, updated_at)
+INSERT INTO clients (id, name, document_id, document_type, plan_type, balance, invoice, id_user, is_active, created_at, updated_at)
 SELECT t.* FROM (
-    SELECT 1 AS id, 'Jose Souza' AS name, '11122233344' AS document_id, 'CPF' AS document_type, 'PREPAID' AS plan_type, 100.00 AS balance, 2 AS id_user, TRUE AS is_active, CURRENT_TIMESTAMP AS created_at, CURRENT_TIMESTAMP AS updated_at
+    SELECT 1 AS id, 'Jose Souza' AS name, '11122233344' AS document_id, 'CPF' AS document_type, 'PREPAID' AS plan_type, 100.00 AS balance, 0 AS invoice, 2 AS id_user, TRUE AS is_active, CURRENT_TIMESTAMP AS created_at, CURRENT_TIMESTAMP AS updated_at
     UNION ALL
-    SELECT 2, 'Company LTDA', '55566678000112', 'CNPJ', 'POSTPAID', 200.00, 3, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+    SELECT 2, 'Company LTDA', '55566678000112', 'CNPJ', 'POSTPAID', 200.00, 0, 3, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) t
 WHERE NOT EXISTS (SELECT 1 FROM clients);
 

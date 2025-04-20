@@ -35,6 +35,7 @@ public class ClientControllerIntegrationTest {
                 .jsonPath("$.documentType").isEqualTo("CPF")
                 .jsonPath("$.planType").isEqualTo("PREPAID")
                 .jsonPath("$.balance").isEqualTo(100.0)
+                .jsonPath("$.invoice").isEqualTo(0)
                 .jsonPath("$.isActive").isEqualTo(true);
     }
 
@@ -93,6 +94,22 @@ public class ClientControllerIntegrationTest {
     @Test
     void getClientById_notFound() {
         webTestClient.get().uri("/clientes/{id}", 9999)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void getClientBalance_success() {
+        webTestClient.get().uri("/clientes/{id}/balance", 1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.balance").isEqualTo(200);
+    }
+
+    @Test
+    void getClientBalance_failure() {
+        webTestClient.get().uri("/clientes/{id}/balance", 999)
                 .exchange()
                 .expectStatus().isNotFound();
     }

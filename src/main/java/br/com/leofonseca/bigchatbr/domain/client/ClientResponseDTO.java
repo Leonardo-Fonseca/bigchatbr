@@ -9,6 +9,7 @@ public record ClientResponseDTO(
         String documentType,
         String planType,
         BigDecimal balance,
+        BigDecimal invoice,
         Boolean isActive
 ) {
     public ClientResponseDTO(Client c) {
@@ -19,6 +20,7 @@ public record ClientResponseDTO(
                 c.getDocumentType().toString(),
                 c.getPlanType().toString(),
                 c.getBalance(),
+                c.getInvoice(),
                 c.getIsActive()
         );
     }

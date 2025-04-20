@@ -26,6 +26,7 @@ public class Client {
     private String documentType;
     private String planType;
     private BigDecimal balance;
+    private BigDecimal invoice = BigDecimal.ZERO;
     private Boolean isActive;
     @OneToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id")

@@ -23,7 +23,16 @@ public class MessageControllerIntegrationTest {
 
     @Test
     void createMessage_success() throws IOException {
+        /* {
+                "conversationId": 1,
+                "senderId": 2,
+                "recipientId": 1,
+                "content": "Mensagem de teste automatizada",
+                "priority": "URGENT",
+                "status": "SENT"
+        }*/
         String valid = Files.readString(Path.of("src/test/resources/test-data/valid-message.json"));
+        // Testa a criaçao de mensagem
         webTestClient.post().uri("/messages")
                 .contentType(APPLICATION_JSON)
                 .bodyValue(valid)
@@ -32,6 +41,17 @@ public class MessageControllerIntegrationTest {
                 .expectBody()
                 .jsonPath("$.content").isEqualTo("Mensagem de teste automatizada")
                 .jsonPath("$.priority").isEqualTo("URGENT");
+
+        // Apos isso teste para verificar se o balance e o invoice foram atualizados corretamente.
+        // sender id = 2 name = Company LTDA Balance inicial = 200.00 Invoice = 0 custo = 0.50
+        webTestClient.get().uri("/clientes/{id}", 2)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(2)
+                .jsonPath("$.name").isEqualTo("Company LTDA")
+                .jsonPath("$.balance").isEqualTo(199.50)
+                .jsonPath("$.invoice").isEqualTo(0.50);
     }
 
     @Test

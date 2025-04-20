@@ -28,6 +28,7 @@ public class MessageService {
     private final ClientService clientService;
 
     public MessageResponseDTO createMessage(MessageRequestDTO requestDTO) {
+        // Cria ou carrega a conversa.
         Message newMessage = new Message();
         if (requestDTO.conversationId() == null){
             Conversation newConversation = conversationService.createFromMessage(requestDTO);
@@ -38,11 +39,40 @@ public class MessageService {
             newMessage.setConversationId(conversation);
         }
 
+        // Carrega o cliente remetente e destinatário
         Client sender = clientService.findClientById(requestDTO.senderId());
         Client recipient = clientService.findClientById(requestDTO.recipientId());
+        // Carrega os dados de prioridade e custo
         String priority = PriorityAndCost.valueOf(requestDTO.priority()).name();
         BigDecimal cost = PriorityAndCost.valueOf(priority).getCost();
 
+        // Carrega o plano.
+        String plan = sender.getPlanType();
+
+        if ("PREPAID".equalsIgnoreCase(plan)) {
+            // valida saldo
+            if (sender.getBalance().compareTo(cost) < 0) {
+                throw new IllegalArgumentException("Saldo insuficiente para enviar mensagem");
+            }
+            // debita do balance
+            sender.setBalance(sender.getBalance().subtract(cost));
+        } else if ("POSTPAID".equalsIgnoreCase(plan)) {
+            // valida limite (balance armazena o limite restante)
+            if (sender.getBalance().compareTo(cost) < 0) {
+                throw new IllegalArgumentException("Limite mensal excedido");
+            }
+            // atualiza limite restante
+            sender.setBalance(sender.getBalance().subtract(cost));
+            // incrementa fatura
+            sender.setInvoice(sender.getInvoice().add(cost));
+        } else {
+            throw new IllegalStateException("Plano desconhecido: " + plan);
+        }
+
+        // Salvar os dados alterados do cliente remetente
+        clientService.saveClient(sender);
+
+        // Termina de montar a mensagem.
         newMessage.setSenderId(sender);
         newMessage.setRecipientId(recipient);
         newMessage.setContent(requestDTO.content());
@@ -52,8 +82,10 @@ public class MessageService {
 
         Message savedMessage = messageRepository.save(newMessage);
 
+        //Atualiza a contagem de mensagens nao lida.
         conversationService.updateFromMessage(savedMessage);
 
+        // Retorna o dto de resposta com os dados da mensagem criada.
         return new MessageResponseDTO(savedMessage);
     }
 

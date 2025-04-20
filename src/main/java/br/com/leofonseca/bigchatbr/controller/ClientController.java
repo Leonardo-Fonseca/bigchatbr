@@ -1,9 +1,6 @@
 package br.com.leofonseca.bigchatbr.controller;
 
-import br.com.leofonseca.bigchatbr.domain.client.Client;
-import br.com.leofonseca.bigchatbr.domain.client.ClientCreateRequestDTO;
-import br.com.leofonseca.bigchatbr.domain.client.ClientResponseDTO;
-import br.com.leofonseca.bigchatbr.domain.client.ClientUpdateRequestDTO;
+import br.com.leofonseca.bigchatbr.domain.client.*;
 import br.com.leofonseca.bigchatbr.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +58,17 @@ public class ClientController {
         try {
             ClientResponseDTO response = clientService.findById(id);
             return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}/balance")
+    public ResponseEntity<ClientBalanceDTO> getClientBalance(
+            @PathVariable("id") Long id
+    ) {
+        try {
+            return ResponseEntity.ok(clientService.getBalanceById(id));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

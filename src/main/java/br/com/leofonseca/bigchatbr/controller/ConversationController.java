@@ -49,14 +49,7 @@ public class ConversationController {
             @PathVariable Long id
     ) {
         try {
-            Conversation conversation = conversationService.findById(id);
-            List<MessageResponseDTO> messages = messageService.listByFilters(
-                    id,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+            List<MessageResponseDTO> messages = messageService.listMessagesFromConversation(id);
             return ResponseEntity.ok().body(messages);
         } catch (Exception e) {
             log.error("Erro ao listar mensagens da conversa id={}", id, e);

@@ -79,4 +79,20 @@ public class MessageService {
 
         return messageRepository.findAll(filtros).stream().map(MessageResponseDTO::new).toList();
     }
+    public List<MessageResponseDTO> listMessagesFromConversation(Long id){
+        List<MessageResponseDTO> messages = this.listByFilters(
+                id,
+                null,
+                null,
+                null,
+                null
+        );
+
+        if (!messages.isEmpty()){
+            Conversation conversation = conversationService.findById(messages.getFirst().conversationId());
+            conversationService.updateUnreadCount(conversation, 0);
+        }
+
+        return messages;
+    }
 }

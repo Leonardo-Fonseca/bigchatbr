@@ -1,19 +1,16 @@
 package br.com.leofonseca.bigchatbr.service;
 
 import br.com.leofonseca.bigchatbr.domain.client.Client;
-import br.com.leofonseca.bigchatbr.domain.client.ClientResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.conversation.Conversation;
 import br.com.leofonseca.bigchatbr.domain.conversation.ConversationResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.Message;
 import br.com.leofonseca.bigchatbr.domain.message.MessageRequestDTO;
+import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
 import br.com.leofonseca.bigchatbr.repository.ConversationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,14 +34,15 @@ public class ConversationService {
 
     public void updateFromMessage(Message message) {
         Conversation conversation = message.getConversationId();
+        Integer updateUnreadCount = conversation.getUnreadCount();
 
         conversation.setLastMessageContent(message.getContent());
         conversation.setLastMessageDate(message.getSentAt());
-        this.updateUnreadCount(conversation, 1);
+        this.updateUnreadCount(conversation, updateUnreadCount + 1);
     }
 
     public void updateUnreadCount(Conversation conversation, Integer value) {
-        var updateUnreadCount = conversation.getUnreadCount() + value;
+        var updateUnreadCount = value;
         conversation.setUnreadCount(updateUnreadCount);
     }
 
@@ -58,5 +56,4 @@ public class ConversationService {
     public List<ConversationResponseDTO> list() {
         return this.convesationRepository.findAll().stream().map(ConversationResponseDTO::new).toList();
     }
-
 }

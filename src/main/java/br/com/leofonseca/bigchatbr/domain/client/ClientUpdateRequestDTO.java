@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @AtLeastOneNotNull
 @ValidDocument
 public record ClientUpdateRequestDTO(
+        String name,
         String documentId,
         String documentType,
         @Pattern(regexp = "(?i)^(prepaid|postpaid)$", message = "planType deve ser prepaid ou postpaid")

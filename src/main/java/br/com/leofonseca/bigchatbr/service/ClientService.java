@@ -22,11 +22,14 @@ public class ClientService {
 
     public ClientResponseDTO create(ClientCreateRequestDTO data) {
         User newUser = userService.createUserFromClient(data);
+        PlanType planType = PlanType.valueOf(data.planType().toUpperCase());
+        DocumentType documentType = DocumentType.valueOf(data.documentType().toUpperCase());
 
         Client newClient = new Client();
+        newClient.setName(data.name());
         newClient.setDocumentId(data.documentId());
-        newClient.setDocumentType(DocumentType.valueOf(data.documentType().toUpperCase()));
-        newClient.setPlanType(PlanType.valueOf(data.planType().toUpperCase()));
+        newClient.setDocumentType(documentType.name());
+        newClient.setPlanType(planType.name());
         newClient.setBalance(data.balance());
         newClient.setIsActive(data.isActive());
         newClient.setUser(newUser);
@@ -50,12 +53,13 @@ public class ClientService {
 
         // Atualiza os campos do Cliente se existir na request
         // TODO: Melhorar legibilidade desse codigo.
+        client.setName(data.name() != null ? data.name() : client.getName());
         client.setDocumentId(data.documentId() != null ? data.documentId() : client.getDocumentId());
         client.setDocumentType(data.documentType() != null
-                ? DocumentType.valueOf(data.documentType().toUpperCase())
+                ? DocumentType.valueOf(data.documentType().toUpperCase()).name()
                 : client.getDocumentType());
         client.setPlanType(data.planType() != null
-                ? PlanType.valueOf(data.planType().toUpperCase())
+                ? PlanType.valueOf(data.planType().toUpperCase()).name()
                 : client.getPlanType());
         client.setBalance(data.balance() != null ? data.balance() : client.getBalance());
         client.setIsActive(data.isActive() != null ? data.isActive() : client.getIsActive());
@@ -69,8 +73,11 @@ public class ClientService {
         return clientList;
     }
     public ClientResponseDTO findById(Long id) {
-        Client client = clientRepository.findById(id)
+        return new ClientResponseDTO(this.findClientById(id));
+    }
+
+    public Client findClientById(Long id) {
+        return clientRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
-        return new ClientResponseDTO(client);
     }
 }

@@ -21,11 +21,10 @@ public class Client {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private String documentId;
-    @Enumerated(EnumType.STRING)
-    private DocumentType documentType;
-    @Enumerated(EnumType.STRING)
-    private PlanType planType;
+    private String documentType;
+    private String planType;
     private BigDecimal balance;
     private Boolean isActive;
     @OneToOne

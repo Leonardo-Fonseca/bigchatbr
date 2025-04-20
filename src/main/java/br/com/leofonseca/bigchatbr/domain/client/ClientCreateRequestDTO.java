@@ -12,6 +12,8 @@ public record ClientCreateRequestDTO(
         @NotBlank
         String documentId,
         @NotBlank
+        String name,
+        @NotBlank
         String documentType,
         @NotBlank
         @Pattern(regexp = "(?i)^(prepaid|postpaid)$", message = "planType deve ser prepaid ou postpaid")

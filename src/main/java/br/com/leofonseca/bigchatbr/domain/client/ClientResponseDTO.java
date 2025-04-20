@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public record ClientResponseDTO(
         Long id,
+        String name,
         String documentId,
         String documentType,
         String planType,
@@ -13,6 +14,7 @@ public record ClientResponseDTO(
     public ClientResponseDTO(Client c) {
         this(
                 c.getId(),
+                c.getName(),
                 c.getDocumentId(),
                 c.getDocumentType().toString(),
                 c.getPlanType().toString(),

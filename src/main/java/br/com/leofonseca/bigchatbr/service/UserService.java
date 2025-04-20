@@ -19,6 +19,7 @@ public class UserService {
     public User createUserFromClient(ClientCreateRequestDTO data) {
 
         User user = new User();
+        user.setName(data.name());
         user.setDocumentId(data.documentId());
         user.setDocumentType(DocumentType.valueOf(data.documentType().toUpperCase()));
         user.setIsActive(data.isActive());

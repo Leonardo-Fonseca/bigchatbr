@@ -69,8 +69,7 @@ public class ClientService {
     }
 
     public List<ClientResponseDTO> list() {
-        List<ClientResponseDTO> clientList = this.clientRepository.findAll().stream().map(ClientResponseDTO::new).toList();
-        return clientList;
+        return this.clientRepository.findAll().stream().map(ClientResponseDTO::new).toList();
     }
     public ClientResponseDTO findById(Long id) {
         return new ClientResponseDTO(this.findClientById(id));

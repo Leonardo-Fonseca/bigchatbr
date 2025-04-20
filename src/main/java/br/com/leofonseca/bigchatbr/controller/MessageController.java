@@ -46,9 +46,9 @@ public class MessageController {
 
     @GetMapping
     public ResponseEntity<List<MessageResponseDTO>> getMessages(
-            @RequestParam(required = false) String conversationId,
-            @RequestParam(required = false) String senderId,
-            @RequestParam(required = false) String recipientId,
+            @RequestParam(required = false) Long conversationId,
+            @RequestParam(required = false) Long senderId,
+            @RequestParam(required = false) Long recipientId,
             @RequestParam(required = false) String priority,
             @RequestParam(required = false) String status) {
 

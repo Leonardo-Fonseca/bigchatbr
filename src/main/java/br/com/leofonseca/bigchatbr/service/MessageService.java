@@ -49,11 +49,10 @@ public class MessageService {
         newMessage.setPriority(priority);
         newMessage.setCost(cost);
         newMessage.setStatus(requestDTO.status());
-        newMessage.setSentAt(LocalDateTime.now());
-
-        conversationService.updateFromMessage(newMessage);
 
         Message savedMessage = messageRepository.save(newMessage);
+
+        conversationService.updateFromMessage(savedMessage);
 
         return new MessageResponseDTO(savedMessage);
     }
@@ -65,9 +64,9 @@ public class MessageService {
     }
 
     public List<MessageResponseDTO> listByFilters(
-            String conversationId,
-            String senderId,
-            String recipientId,
+            Long conversationId,
+            Long senderId,
+            Long recipientId,
             String priority,
             String status
     ) {

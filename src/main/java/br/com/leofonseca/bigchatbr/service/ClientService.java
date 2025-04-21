@@ -6,6 +6,7 @@ import br.com.leofonseca.bigchatbr.domain.user.User;
 import br.com.leofonseca.bigchatbr.repository.ClientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,12 +14,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class ClientService {
     private final ClientRepository clientRepository;
     private final UserService userService;
 
     public ClientResponseDTO create(ClientCreateRequestDTO data) {
+        log.info("Criando novo cliente com nome: {}", data.name());
         User newUser = userService.createUserFromClient(data);
         PlanType planType = PlanType.valueOf(data.planType().toUpperCase());
         DocumentType documentType = DocumentType.valueOf(data.documentType().toUpperCase());
@@ -33,24 +36,29 @@ public class ClientService {
         newClient.setUser(newUser);
 
         Client savedClient = clientRepository.save(newClient);
-
+        log.info("Cliente criado com ID: {}", savedClient.getId());
         return new ClientResponseDTO(savedClient);
     }
 
-    public ClientResponseDTO update(
-            Long id,
-            ClientUpdateRequestDTO data
-    ) {
+    public ClientResponseDTO update(Long id, ClientUpdateRequestDTO data) {
+        log.info("Atualizando cliente com ID: {}", id);
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
 
-        // Se password vier na request atualiza a senha do usuario
         if (data.password() != null) {
             userService.updateUserPassword(client.getUser().getId(), data.password());
+            log.info("Senha do usuário atualizada para cliente ID: {}", id);
         }
 
-        // Atualiza os campos do Cliente se existir na request
-        // TODO: Melhorar legibilidade desse codigo.
+        updateClientFields(client, data);
+
+        Client savedClient = clientRepository.save(client);
+        log.info("Cliente atualizado com sucesso. ID: {}", savedClient.getId());
+        return new ClientResponseDTO(savedClient);
+    }
+
+    private void updateClientFields(Client client, ClientUpdateRequestDTO data) {
+        // Centraliza as atualizações para melhorar legibilidade
         client.setName(data.name() != null ? data.name() : client.getName());
         client.setDocumentId(data.documentId() != null ? data.documentId() : client.getDocumentId());
         client.setDocumentType(data.documentType() != null
@@ -61,9 +69,6 @@ public class ClientService {
                 : client.getPlanType());
         client.setBalance(data.balance() != null ? data.balance() : client.getBalance());
         client.setIsActive(data.isActive() != null ? data.isActive() : client.getIsActive());
-
-        Client savedClient = clientRepository.save(client);
-        return new ClientResponseDTO(savedClient);
     }
 
     public List<ClientResponseDTO> list() {
@@ -78,12 +83,15 @@ public class ClientService {
         return new ClientResponseDTO(this.findClientById(id));
     }
 
-    public ClientLimitedResponseDTO findLimitedById(Long id) { return new ClientLimitedResponseDTO(this.findClientById(id));}
+    public ClientLimitedResponseDTO findLimitedById(Long id) {
+        return new ClientLimitedResponseDTO(this.findClientById(id));
+    }
 
     public Client findClientById(Long id) {
         return clientRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
     }
+
     public Client findClientByDocumentId(String documentId) {
         return clientRepository.findByDocumentId(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));

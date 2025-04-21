@@ -32,7 +32,7 @@ public class ConversationService {
     }
 
     public void updateFromMessage(Message message) {
-        Conversation conversation = message.getConversationId();
+        Conversation conversation = message.getConversation();
         Integer updateUnreadCount = conversation.getUnreadCount();
 
         conversation.setLastMessageContent(message.getContent());
@@ -54,5 +54,15 @@ public class ConversationService {
 
     public List<ConversationResponseDTO> list() {
         return this.convesationRepository.findAll().stream().map(ConversationResponseDTO::new).toList();
+    }
+
+    public List<ConversationResponseDTO> listForUser(String documentId) {
+        var client = clientService.findClientByDocumentId(documentId);
+        return listByClient(client.getId());
+    }
+
+    public List<ConversationResponseDTO> listByClient(Long clientId) {
+        List<Conversation> conversations = convesationRepository.findByClient_IdOrRecipient_Id(clientId, clientId);
+        return conversations.stream().map(ConversationResponseDTO::new).toList();
     }
 }

@@ -1,6 +1,5 @@
 package br.com.leofonseca.bigchatbr.domain.conversation;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record ConversationResponseDTO (
@@ -15,8 +14,8 @@ public record ConversationResponseDTO (
     public ConversationResponseDTO(Conversation conversation) {
         this(
                 conversation.getId(),
-                conversation.getClientId().getId(),
-                conversation.getRecipientId().getId(),
+                conversation.getClient().getId(),
+                conversation.getRecipient().getId(),
                 conversation.getRecipientName(),
                 conversation.getLastMessageContent(),
                 conversation.getLastMessageDate(),

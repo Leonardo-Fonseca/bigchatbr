@@ -1,7 +1,6 @@
 package br.com.leofonseca.bigchatbr.service;
 
 import br.com.leofonseca.bigchatbr.domain.client.Client;
-import br.com.leofonseca.bigchatbr.domain.client.ClientResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.conversation.Conversation;
 import br.com.leofonseca.bigchatbr.domain.message.*;
 import br.com.leofonseca.bigchatbr.repository.MessageRepository;
@@ -34,11 +33,11 @@ public class MessageService {
         Message newMessage = new Message();
         if (requestDTO.conversationId() == null){
             Conversation newConversation = conversationService.createFromMessage(requestDTO, senderDocumentId);
-            newMessage.setConversationId(newConversation);
+            newMessage.setConversation(newConversation);
         } else {
             Conversation conversation = conversationService.findById(requestDTO.conversationId());
 
-            newMessage.setConversationId(conversation);
+            newMessage.setConversation(conversation);
         }
 
         // Carrega o cliente remetente e destinatário
@@ -75,8 +74,8 @@ public class MessageService {
         clientService.saveClient(sender);
 
         // Termina de montar a mensagem.
-        newMessage.setSenderId(sender);
-        newMessage.setRecipientId(recipient);
+        newMessage.setSender(sender);
+        newMessage.setRecipient(recipient);
         newMessage.setContent(requestDTO.content());
         newMessage.setPriority(priority);
         newMessage.setCost(cost);

@@ -16,9 +16,9 @@ public record MessageResponseDTO (
     public MessageResponseDTO(Message message) {
         this(
                 message.getId(),
-                message.getConversationId().getId(),
-                message.getSenderId().getId(),
-                message.getRecipientId().getId(),
+                message.getConversation().getId(),
+                message.getSender().getId(),
+                message.getRecipient().getId(),
                 message.getContent(),
                 message.getPriority(),
                 message.getStatus(),

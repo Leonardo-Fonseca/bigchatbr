@@ -22,13 +22,13 @@ public class Message {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "conversation_id", referencedColumnName = "id")
-    private Conversation conversationId;
+    private Conversation conversation;
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
-    private Client senderId;
+    private Client sender;
     @ManyToOne
     @JoinColumn(name = "recipient_id", referencedColumnName = "id")
-    private Client recipientId;
+    private Client recipient;
     private String content;
     private String priority;
     @Enumerated(EnumType.STRING)

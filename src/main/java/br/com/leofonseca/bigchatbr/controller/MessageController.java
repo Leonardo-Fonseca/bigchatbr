@@ -16,19 +16,25 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/messages")
 @RequiredArgsConstructor
+@Tag(name = "Mensagens", description = "Endpoints para operações de mensagens")
 public class MessageController {
     private final MessageService messageService;
 
     @PostMapping
+    @Operation(summary = "Criar mensagem", description = "Cria uma nova mensagem.")
+    @ApiResponse(responseCode = "201", description = "Mensagem criada com sucesso")
     public ResponseEntity<MessageResponseDTO> createMessage(
             @AuthenticationPrincipal User loggedUser,
             @RequestBody @Valid MessageRequestDTO requestDTO
     ){
         try {
-            // extrai o documentId do UserDetails
             String documentId = loggedUser.getDocumentId();
             MessageResponseDTO createdMessage = messageService.createMessage(documentId, requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
@@ -38,6 +44,8 @@ public class MessageController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter mensagem por ID", description = "Retorna a mensagem com o ID especificado")
+    @ApiResponse(responseCode = "200", description = "Mensagem encontrada")
     public ResponseEntity<MessageResponseDTO> getMessageById(
             @PathVariable Long id
     ) {
@@ -50,6 +58,8 @@ public class MessageController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar mensagens", description = "Retorna uma lista de mensagens de acordo com os filtros informados")
+    @ApiResponse(responseCode = "200", description = "Lista de mensagens obtida com sucesso")
     public ResponseEntity<List<MessageResponseDTO>> getMessages(
             @RequestParam(required = false) Long conversationId,
             @RequestParam(required = false) Long senderId,
@@ -65,7 +75,6 @@ public class MessageController {
                     priority,
                     status
             );
-
             return ResponseEntity.ok(messages);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -73,6 +82,8 @@ public class MessageController {
     }
 
     @GetMapping("{ID}/status")
+    @Operation(summary = "Obter status da mensagem", description = "Retorna o status da mensagem com o ID informado")
+    @ApiResponse(responseCode = "200", description = "Status retornado")
     public ResponseEntity<MessageResponseDTO> getMessageStatus(
             @PathVariable Long ID
     ) {

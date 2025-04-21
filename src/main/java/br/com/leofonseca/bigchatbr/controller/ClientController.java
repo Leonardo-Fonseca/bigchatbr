@@ -2,6 +2,8 @@ package br.com.leofonseca.bigchatbr.controller;
 
 import br.com.leofonseca.bigchatbr.domain.client.*;
 import br.com.leofonseca.bigchatbr.service.ClientService;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/clientes")
 @RequiredArgsConstructor
+@Tag(name = "Clientes", description = "Endpoints para operações de clientes.")
 public class ClientController {
     private final ClientService clientService;
 
@@ -56,11 +59,23 @@ public class ClientController {
         responses = {
             @ApiResponse(
                 responseCode = "200",
-                description = "Lista de clientes completa ou limitada",
+                description = "Lista de clientes completa caso o usuario autenticado seja ADMIN.",
                 content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(oneOf = { ClientResponseDTO.class, ClientLimitedResponseDTO.class })
+                    array = @ArraySchema(
+                            schema = @Schema(implementation = ClientResponseDTO.class)
+                    )
                 )
+            ),
+            @ApiResponse(
+                    responseCode = "206",
+                    description = "Lista de clientes limitada caso o usuario autenticado seja CLIENTE.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = ClientLimitedResponseDTO.class)
+                            )
+                    )
             )
         }
     )
@@ -74,7 +89,7 @@ public class ClientController {
                 return ResponseEntity.ok(response);
             } else {
                 List<ClientLimitedResponseDTO> response = clientService.listLimited();
-                return ResponseEntity.ok(response);
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response);
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -87,12 +102,20 @@ public class ClientController {
         description = "Busca as informações de um cliente pelo ID, com dados completos ou limitados conforme o perfil.",
         responses = {
             @ApiResponse(
-                responseCode = "200",
-                description = "Cliente encontrado",
-                content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(oneOf = { ClientResponseDTO.class, ClientLimitedResponseDTO.class })
-                )
+                    responseCode = "200",
+                    description = "LDetalhes do cliente completa caso o usuario autenticado seja ADMIN.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ClientResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "206",
+                    description = "Detalhes do cliente limitado caso o usuario autenticado seja CLIENTE.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ClientLimitedResponseDTO.class)
+                    )
             ),
             @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
         }

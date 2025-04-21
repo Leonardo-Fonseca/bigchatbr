@@ -18,16 +18,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping("/conversations")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Conversas", description = "Endpoints para operações de conversas.")
 public class ConversationController {
     private final ConversationService conversationService;
     private final MessageService messageService;
 
     @GetMapping
+    @Operation(summary = "Obter lista de conversas", description = "Retorna a lista de conversas. Admins veem todas, demais usuários vêem suas conversas.")
     public ResponseEntity<List<ConversationResponseDTO>> getConversations(
             @AuthenticationPrincipal User loggedUser
     ) {
@@ -49,6 +54,7 @@ public class ConversationController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter conversa por ID", description = "Retorna a conversa correspondente ao ID informado.")
     public ResponseEntity<ConversationResponseDTO> getConversationById(
             @PathVariable Long id
     ) {
@@ -61,6 +67,7 @@ public class ConversationController {
     }
 
     @GetMapping("/{id}/message")
+    @Operation(summary = "Obter mensagens da conversa", description = "Retorna a lista de mensagens da conversa especificada pelo ID.")
     public ResponseEntity<List<MessageResponseDTO>> getMessagesFromConversation(
             @PathVariable Long id
     ) {

@@ -3,20 +3,18 @@ package br.com.leofonseca.bigchatbr.service;
 import br.com.leofonseca.bigchatbr.domain.client.Client;
 import br.com.leofonseca.bigchatbr.domain.client.ClientResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.conversation.Conversation;
-import br.com.leofonseca.bigchatbr.domain.message.Message;
-import br.com.leofonseca.bigchatbr.domain.message.MessageRequestDTO;
-import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
-import br.com.leofonseca.bigchatbr.domain.message.PriorityAndCost;
+import br.com.leofonseca.bigchatbr.domain.message.*;
 import br.com.leofonseca.bigchatbr.repository.MessageRepository;
+import br.com.leofonseca.bigchatbr.service.queue.MessageQueue;
 import br.com.leofonseca.bigchatbr.specification.MessageSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +24,10 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ConversationService conversationService;
     private final ClientService clientService;
+    private final MessageQueue queue;
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     public MessageResponseDTO createMessage(MessageRequestDTO requestDTO) {
         // Cria ou carrega a conversa.
@@ -78,9 +80,12 @@ public class MessageService {
         newMessage.setContent(requestDTO.content());
         newMessage.setPriority(priority);
         newMessage.setCost(cost);
-        newMessage.setStatus(requestDTO.status());
+        newMessage.setStatus(MessageStatus.QUEUED);
 
         Message savedMessage = messageRepository.save(newMessage);
+
+        boolean urgent = "URGENT".equalsIgnoreCase(savedMessage.getPriority());
+        publisher.publishEvent(new MessageCreatedEvent(savedMessage.getId(), urgent));
 
         //Atualiza a contagem de mensagens nao lida.
         conversationService.updateFromMessage(savedMessage);
@@ -93,6 +98,11 @@ public class MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mensagem não encontrada"));
         return new MessageResponseDTO(message);
+    }
+
+    public Message findMessageById(Long id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Mensagem não encontrada"));
     }
 
     public List<MessageResponseDTO> listByFilters(
@@ -112,19 +122,42 @@ public class MessageService {
         return messageRepository.findAll(filtros).stream().map(MessageResponseDTO::new).toList();
     }
     public List<MessageResponseDTO> listMessagesFromConversation(Long id){
-        List<MessageResponseDTO> messages = this.listByFilters(
-                id,
-                null,
-                null,
-                null,
-                null
-        );
+        List<Message> messages = messageRepository.findAll();
 
-        if (!messages.isEmpty()){
-            Conversation conversation = conversationService.findById(messages.getFirst().conversationId());
-            conversationService.updateUnreadCount(conversation, 0);
+        if (!messages.isEmpty()) {
+            // TODO: ATUALIZAR PARA MARCAR SOMENTE AS MENSAGENS DO USUARIO LOGADO
+            // Marcaa todas as mensagens SENT como READ
+            int toRead = 0;
+            for (Message message : messages) {
+                if (message.getStatus() == MessageStatus.SENT) {
+                    // atualiza no banco
+                    updateStatus(message.getId(), MessageStatus.READ);
+                    // reflete na DTO que vamos retornar
+                    message.setStatus(MessageStatus.READ);
+
+                    toRead++;
+                }
+            }
+
+            // Atualizar contador de unread na conversa
+            Conversation conversation = conversationService.findById(id);
+            int currentUnread = conversation.getUnreadCount();
+            int newUnread = Math.max(0, currentUnread - toRead);
+            conversationService.updateUnreadCount(conversation, newUnread);
         }
 
-        return messages;
+        return messages.stream().map(MessageResponseDTO::new).toList();
+    }
+
+    public void updateStatus(Long id, MessageStatus status) {
+        Message msg = this.findMessageById(id);
+        msg.setStatus(status);
+        messageRepository.save(msg);
+    }
+
+    public void sendMessage(Long id) throws Exception {
+        // Aguarda 5 segundos para simular o envio da mensagem.
+        // Para dar tempo de acumuluar mensagens na fila.
+        Thread.sleep(2500);
     }
 }

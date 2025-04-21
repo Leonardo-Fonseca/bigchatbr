@@ -9,7 +9,7 @@ public record MessageResponseDTO (
         Long recipientId,
         String content,
         String priority,
-        String status,
+        MessageStatus status,
         BigDecimal cost,
         String sentAt
 ){

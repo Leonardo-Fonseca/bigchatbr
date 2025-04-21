@@ -1,7 +1,7 @@
 package br.com.leofonseca.bigchatbr.domain.message;
 
 public record MessageStatusDTO(
-        String status
+        MessageStatus status
 ) {
     public MessageStatusDTO(Message message) {
         this(

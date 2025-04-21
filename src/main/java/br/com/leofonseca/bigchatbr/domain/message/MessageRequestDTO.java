@@ -12,8 +12,6 @@ public record MessageRequestDTO(
         @NotBlank
         String content,
         @NotBlank
-        String priority,
-        @NotBlank
-        String status
+        String priority
 ) {
 }

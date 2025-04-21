@@ -31,7 +31,9 @@ public class Message {
     private Client recipientId;
     private String content;
     private String priority;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MessageStatus status;
     private BigDecimal cost;
     @CreatedDate
     @Column(nullable = false, updatable = false)

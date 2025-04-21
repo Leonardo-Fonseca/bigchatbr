@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/clientes")
@@ -19,8 +23,9 @@ public class ClientController {
     private final ClientService clientService;
 
     @PostMapping
+    @Operation(summary = "Criar novo cliente", description = "Cria um novo cliente a partir dos dados fornecidos.")
     public ResponseEntity<ClientResponseDTO> createClient(
-            @RequestBody @Valid  ClientCreateRequestDTO request
+            @RequestBody @Valid ClientCreateRequestDTO request
     ) {
         try {
             ClientResponseDTO response = clientService.create(request);
@@ -31,6 +36,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar cliente", description = "Atualiza os dados do cliente para o ID informado.")
     public ResponseEntity<ClientResponseDTO> updateClient(
             @PathVariable("id") Long id,
             @RequestBody @Valid ClientUpdateRequestDTO request
@@ -44,6 +50,20 @@ public class ClientController {
     }
 
     @GetMapping
+    @Operation(
+        summary = "Listar clientes",
+        description = "Retorna a lista completa ou limitada de clientes conforme o perfil do usuário.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Lista de clientes completa ou limitada",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(oneOf = { ClientResponseDTO.class, ClientLimitedResponseDTO.class })
+                )
+            )
+        }
+    )
     public ResponseEntity<List<?>> getAllClients() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -62,6 +82,21 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Buscar cliente",
+        description = "Busca as informações de um cliente pelo ID, com dados completos ou limitados conforme o perfil.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Cliente encontrado",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(oneOf = { ClientResponseDTO.class, ClientLimitedResponseDTO.class })
+                )
+            ),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+        }
+    )
     public ResponseEntity<?> getClientById(
             @PathVariable("id") Long id
     ) {
@@ -82,6 +117,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}/balance")
+    @Operation(summary = "Saldo do cliente", description = "Retorna o saldo do cliente para o ID informado.")
     public ResponseEntity<ClientBalanceDTO> getClientBalance(
             @PathVariable("id") Long id
     ) {

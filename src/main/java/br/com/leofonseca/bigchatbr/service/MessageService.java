@@ -141,35 +141,28 @@ public class MessageService {
         return messageRepository.findAll(filtros).stream().map(MessageResponseDTO::new).toList();
     }
 
-    public List<MessageResponseDTO> listMessagesFromConversation(Long id){
-        log.debug("Listando mensagens da conversa com ID: {}", id);
+    public List<MessageResponseDTO> listMessagesFromConversation(Long conversationId, Long loggedUserId) {
+        log.debug("Listando mensagens da conversa com ID: {}", conversationId);
 
         List<Message> messages = messageRepository.findAll();
 
-        if (!messages.isEmpty()) {
-            // TODO: ATUALIZAR PARA MARCAR SOMENTE AS MENSAGENS DO USUARIO LOGADO
-            // Marcaa todas as mensagens SENT como READ
-            int toRead = 0;
-            for (Message message : messages) {
-                if (message.getStatus() == MessageStatus.SENT) {
-                    // atualiza no banco
-                    updateStatus(message.getId(), MessageStatus.READ);
-                    // reflete na DTO que vamos retornar
-                    message.setStatus(MessageStatus.READ);
-
-                    toRead++;
-                }
+        int toRead = 0;
+        for (Message message : messages) {
+            // Atualiza apenas as mensagens cujo recipient seja o usuário logado e que estejam como SENT
+            if (message.getStatus() == MessageStatus.SENT &&
+                message.getRecipient().getId().equals(loggedUserId)) {
+                updateStatus(message.getId(), MessageStatus.READ);
+                message.setStatus(MessageStatus.READ);
+                toRead++;
             }
-
-            // Atualizar contador de unread na conversa
-            Conversation conversation = conversationService.findById(id);
-            int currentUnread = conversation.getUnreadCount();
-            int newUnread = Math.max(0, currentUnread - toRead);
-
-            conversationService.updateUnreadCount(conversation, newUnread);
-
-            log.info("Atualizada contagem de mensagens não lidas para conversa ID: {}", id);
         }
+
+        // Atualiza a contagem somente com as mensagens alteradas
+        Conversation conversation = conversationService.findById(conversationId);
+        int currentUnread = conversation.getUnreadCount();
+        int newUnread = Math.max(0, currentUnread - toRead);
+        conversationService.updateUnreadCount(conversation, newUnread);
+        log.info("Atualizada contagem de mensagens não lidas para conversa ID: {}", conversationId);
 
         return messages.stream().map(MessageResponseDTO::new).toList();
     }

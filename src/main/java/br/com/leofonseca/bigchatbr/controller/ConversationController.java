@@ -69,10 +69,11 @@ public class ConversationController {
     @GetMapping("/{id}/message")
     @Operation(summary = "Obter mensagens da conversa", description = "Retorna a lista de mensagens da conversa especificada pelo ID.")
     public ResponseEntity<List<MessageResponseDTO>> getMessagesFromConversation(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal User loggedUser
     ) {
         try {
-            List<MessageResponseDTO> messages = messageService.listMessagesFromConversation(id);
+            List<MessageResponseDTO> messages = messageService.listMessagesFromConversation(id, loggedUser.getId());
             return ResponseEntity.ok().body(messages);
         } catch (Exception e) {
             log.error("Erro ao listar mensagens da conversa id={}", id, e);

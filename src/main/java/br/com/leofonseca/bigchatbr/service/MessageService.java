@@ -29,11 +29,11 @@ public class MessageService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
-    public MessageResponseDTO createMessage(MessageRequestDTO requestDTO) {
+    public MessageResponseDTO createMessage(String senderDocumentId, MessageRequestDTO requestDTO) {
         // Cria ou carrega a conversa.
         Message newMessage = new Message();
         if (requestDTO.conversationId() == null){
-            Conversation newConversation = conversationService.createFromMessage(requestDTO);
+            Conversation newConversation = conversationService.createFromMessage(requestDTO, senderDocumentId);
             newMessage.setConversationId(newConversation);
         } else {
             Conversation conversation = conversationService.findById(requestDTO.conversationId());
@@ -42,7 +42,7 @@ public class MessageService {
         }
 
         // Carrega o cliente remetente e destinatário
-        Client sender = clientService.findClientById(requestDTO.senderId());
+        Client sender = clientService.findClientByDocumentId(senderDocumentId);
         Client recipient = clientService.findClientById(requestDTO.recipientId());
         // Carrega os dados de prioridade e custo
         String priority = PriorityAndCost.valueOf(requestDTO.priority()).name();

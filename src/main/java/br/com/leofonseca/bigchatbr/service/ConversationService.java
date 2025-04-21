@@ -19,8 +19,8 @@ public class ConversationService {
     private final ConversationRepository convesationRepository;
     private final ClientService clientService;
 
-    public Conversation createFromMessage(MessageRequestDTO messageRequestDTO) {
-        Client sender = clientService.findClientById(messageRequestDTO.senderId());
+    public Conversation createFromMessage(MessageRequestDTO messageRequestDTO, String senderDocumentId) {
+        Client sender = clientService.findClientByDocumentId(senderDocumentId);
         Client recipient = clientService.findClientById(messageRequestDTO.recipientId());
         Conversation newConversation = new Conversation(
                 sender,

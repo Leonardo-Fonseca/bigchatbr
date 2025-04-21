@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record MessageRequestDTO(
         Long conversationId,
         @NotNull
-        Long senderId,
-        @NotNull
         Long recipientId,
         @NotBlank
         String content,

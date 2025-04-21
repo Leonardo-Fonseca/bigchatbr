@@ -3,12 +3,14 @@ package br.com.leofonseca.bigchatbr.controller;
 import br.com.leofonseca.bigchatbr.domain.message.Message;
 import br.com.leofonseca.bigchatbr.domain.message.MessageRequestDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
+import br.com.leofonseca.bigchatbr.domain.user.User;
 import br.com.leofonseca.bigchatbr.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -22,10 +24,13 @@ public class MessageController {
 
     @PostMapping
     public ResponseEntity<MessageResponseDTO> createMessage(
+            @AuthenticationPrincipal User loggedUser,
             @RequestBody @Valid MessageRequestDTO requestDTO
     ){
         try {
-            MessageResponseDTO createdMessage = messageService.createMessage(requestDTO);
+            // extrai o documentId do UserDetails
+            String documentId = loggedUser.getDocumentId();
+            MessageResponseDTO createdMessage = messageService.createMessage(documentId, requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

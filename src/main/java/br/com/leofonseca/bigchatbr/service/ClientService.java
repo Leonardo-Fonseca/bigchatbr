@@ -69,12 +69,23 @@ public class ClientService {
     public List<ClientResponseDTO> list() {
         return this.clientRepository.findAll().stream().map(ClientResponseDTO::new).toList();
     }
+
+    public List<ClientLimitedResponseDTO> listLimited() {
+        return clientRepository.findAll().stream().map(ClientLimitedResponseDTO::new).toList();
+    }
+
     public ClientResponseDTO findById(Long id) {
         return new ClientResponseDTO(this.findClientById(id));
     }
 
+    public ClientLimitedResponseDTO findLimitedById(Long id) { return new ClientLimitedResponseDTO(this.findClientById(id));}
+
     public Client findClientById(Long id) {
         return clientRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+    }
+    public Client findClientByDocumentId(String documentId) {
+        return clientRepository.findByDocumentId(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
     }
 

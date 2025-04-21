@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
 @RequestMapping("/clientes")
@@ -42,22 +44,38 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientResponseDTO>> getAllClients() {
+    public ResponseEntity<List<?>> getAllClients() {
         try {
-            List<ClientResponseDTO> response = clientService.list();
-            return ResponseEntity.ok(response);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            if (isAdmin) {
+                List<ClientResponseDTO> response = clientService.list();
+                return ResponseEntity.ok(response);
+            } else {
+                List<ClientLimitedResponseDTO> response = clientService.listLimited();
+                return ResponseEntity.ok(response);
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao listar clientes", e);
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> getClientById(
+    public ResponseEntity<?> getClientById(
             @PathVariable("id") Long id
     ) {
         try {
-            ClientResponseDTO response = clientService.findById(id);
-            return ResponseEntity.ok(response);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            if (isAdmin) {
+                ClientResponseDTO response = clientService.findById(id);
+                return ResponseEntity.ok(response);
+            } else {
+                ClientLimitedResponseDTO response = clientService.findLimitedById(id);
+                return ResponseEntity.ok(response);
+            }
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

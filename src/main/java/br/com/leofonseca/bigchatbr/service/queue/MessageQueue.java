@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -17,6 +18,10 @@ public class MessageQueue {
     private static final int MAX_URGENTS = 4;
     private int cycleCount = 0;
 
+    // Estatísticas
+    private final AtomicInteger totalEnqueued = new AtomicInteger(0);
+    private final AtomicInteger totalProcessed = new AtomicInteger(0);
+
     /** Enfileira uma mensagem e libera um permit para o consumidor. */
     public void enqueue(Long messageId, boolean urgent) {
         if (urgent) {
@@ -25,6 +30,8 @@ public class MessageQueue {
         else {
             normalQueue.addLast(messageId);
         }
+
+        totalEnqueued.incrementAndGet();
 
         log.info("[QUEUE] enqueued id={} urgent={} | sizes: urgent={}, normal={}",
                 messageId, urgent, urgentQueue.size(), normalQueue.size());
@@ -38,38 +45,54 @@ public class MessageQueue {
      * Bloqueia o thread em available.acquire() até que enqueue() libere.
      */
     public Long dequeue() throws InterruptedException {
-        available.acquire();  // espera algo na fila
+        available.acquire();
+
+        Long id;
         synchronized (this) {
-            boolean hasU = !urgentQueue.isEmpty();
-            boolean hasN = !normalQueue.isEmpty();
+            boolean hasUrgent = !urgentQueue.isEmpty();
+            boolean hasNormal = !normalQueue.isEmpty();
 
-            // slots 0,1,2,3 → urgentes
             if (cycleCount < MAX_URGENTS) {
-                if (hasU) {
+                if (hasUrgent) {
                     cycleCount++;
-                    return urgentQueue.pollFirst();
+                    id = urgentQueue.pollFirst();
+                } else if (hasNormal) {
+                    cycleCount++;
+                    id = normalQueue.pollFirst();
+                } else {
+                    id = null;
                 }
-                if (hasN) {
-                    // se não houver urgente, mas tiver normal, serve normal
-                    cycleCount++;
-                    return normalQueue.pollFirst();
+            } else {
+                if (hasNormal) {
+                    cycleCount = 0;
+                    id = normalQueue.pollFirst();
+                } else if (hasUrgent) {
+                    cycleCount = 1;
+                    id = urgentQueue.pollFirst();
+                } else {
+                    id = null;
                 }
             }
-            // slot 4 → normal
-            if (cycleCount == MAX_URGENTS) {
-                if (hasN) {
-                    cycleCount = 0;              // reinicia o ciclo
-                    return normalQueue.pollFirst();
-                }
-                if (hasU) {
-                    // fallback em urgente
-                    cycleCount = 1;              // já processou 1 urgente do próximo ciclo
-                    return urgentQueue.pollFirst();
-                }
-            }
-
-            // nenhuma mensagem? ( não deveria acontecer, mas pra segurança )
-            return null;
         }
+
+        if (id != null) {
+            totalProcessed.incrementAndGet();
+        }
+        return id;
+    }
+
+
+    // Getters para o controller
+    public int getUrgentSize() {
+        return urgentQueue.size();
+    }
+    public int getNormalSize() {
+        return normalQueue.size();
+    }
+    public int getTotalEnqueued() {
+        return totalEnqueued.get();
+    }
+    public int getTotalProcessed() {
+        return totalProcessed.get();
     }
 }

@@ -40,6 +40,7 @@ public class SecurityConfigurations  {
                                 "/clientes/*"
                         ).authenticated()
                         .requestMatchers("/clientes/**").hasRole("ADMIN")
+                        .requestMatchers("/queue/status").permitAll() // Deixei liberado para todos para facilitar acompanhar a fila durante os testes.
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

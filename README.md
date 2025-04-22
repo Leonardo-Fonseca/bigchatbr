@@ -8,7 +8,7 @@
  <img src="https://img.shields.io/static/v1?label=Perfil&message=Back-End&color=1dcf4c&labelColor=000000"/>
 </p>
 
-API para gerenciar um chat, com CRUD, Fila de Mensagens, Autenticaçao, [desse desafio](https://github.com/RocketBus/quero-ser-clickbus/tree/master/testes/backend-developer) para desenvolvedores que se candidatam para a Irrah Tech.
+API para gerenciar um chat, com CRUD, Fila de Mensagens, Autenticaçao, [desse desafio](https://github.com/irrahgroup/irrah-tech-challenges/tree/main) para desenvolvedores que se candidatam para a [Irrah Tech](https://www.linkedin.com/company/irrahtech/posts/?feedView=all).
 
 ## Tecnologias
 

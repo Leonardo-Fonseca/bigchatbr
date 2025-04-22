@@ -1,6 +1,5 @@
 package br.com.leofonseca.bigchatbr.domain.client;
 
-import br.com.leofonseca.bigchatbr.domain.enums.DocumentType;
 import br.com.leofonseca.bigchatbr.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;

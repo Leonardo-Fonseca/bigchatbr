@@ -1,6 +1,7 @@
 package br.com.leofonseca.bigchatbr.domain.user;
 
-import br.com.leofonseca.bigchatbr.domain.enums.DocumentType;
+import br.com.leofonseca.bigchatbr.enums.DocumentType;
+import br.com.leofonseca.bigchatbr.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

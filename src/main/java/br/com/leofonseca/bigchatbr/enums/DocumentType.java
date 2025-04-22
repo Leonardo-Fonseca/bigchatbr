@@ -1,4 +1,4 @@
-package br.com.leofonseca.bigchatbr.domain.enums;
+package br.com.leofonseca.bigchatbr.enums;
 
 public enum DocumentType {
     CPF("CPF"),

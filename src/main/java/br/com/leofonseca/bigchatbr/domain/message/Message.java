@@ -2,6 +2,7 @@ package br.com.leofonseca.bigchatbr.domain.message;
 
 import br.com.leofonseca.bigchatbr.domain.client.Client;
 import br.com.leofonseca.bigchatbr.domain.conversation.Conversation;
+import br.com.leofonseca.bigchatbr.enums.MessageStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

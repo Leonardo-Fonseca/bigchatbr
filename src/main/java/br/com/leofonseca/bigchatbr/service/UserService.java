@@ -1,10 +1,9 @@
 package br.com.leofonseca.bigchatbr.service;
 
-import br.com.leofonseca.bigchatbr.domain.client.Client;
 import br.com.leofonseca.bigchatbr.domain.client.ClientCreateRequestDTO;
-import br.com.leofonseca.bigchatbr.domain.enums.DocumentType;
+import br.com.leofonseca.bigchatbr.enums.DocumentType;
 import br.com.leofonseca.bigchatbr.domain.user.User;
-import br.com.leofonseca.bigchatbr.domain.user.UserRole;
+import br.com.leofonseca.bigchatbr.enums.UserRole;
 import br.com.leofonseca.bigchatbr.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

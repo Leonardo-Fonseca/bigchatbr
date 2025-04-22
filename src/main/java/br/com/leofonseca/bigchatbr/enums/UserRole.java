@@ -1,4 +1,4 @@
-package br.com.leofonseca.bigchatbr.domain.user;
+package br.com.leofonseca.bigchatbr.enums;
 
 public enum UserRole {
     ADMIN("ADMIN"),

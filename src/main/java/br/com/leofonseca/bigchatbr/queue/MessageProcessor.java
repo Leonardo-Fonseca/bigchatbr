@@ -1,12 +1,10 @@
-package br.com.leofonseca.bigchatbr.service.queue;
+package br.com.leofonseca.bigchatbr.queue;
 
-import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
-import br.com.leofonseca.bigchatbr.domain.message.MessageStatus;
+import br.com.leofonseca.bigchatbr.enums.MessageStatus;
 import br.com.leofonseca.bigchatbr.service.MessageService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

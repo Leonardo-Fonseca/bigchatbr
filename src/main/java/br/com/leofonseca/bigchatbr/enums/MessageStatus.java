@@ -1,4 +1,4 @@
-package br.com.leofonseca.bigchatbr.domain.message;
+package br.com.leofonseca.bigchatbr.enums;
 
 public enum MessageStatus {
     QUEUED,

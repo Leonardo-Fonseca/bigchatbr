@@ -1,7 +1,7 @@
 package br.com.leofonseca.bigchatbr.controller;
 
 import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
-import br.com.leofonseca.bigchatbr.domain.message.MessageStatus;
+import br.com.leofonseca.bigchatbr.enums.MessageStatus;
 import br.com.leofonseca.bigchatbr.domain.user.AuthenticationDTO;
 import br.com.leofonseca.bigchatbr.domain.user.LoginResponseDTO;
 import org.junit.jupiter.api.BeforeEach;

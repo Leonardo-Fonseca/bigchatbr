@@ -1,10 +1,9 @@
 package br.com.leofonseca.bigchatbr.flow;
 
-import br.com.leofonseca.bigchatbr.domain.client.Client;
 import br.com.leofonseca.bigchatbr.domain.conversation.ConversationResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageRequestDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
-import br.com.leofonseca.bigchatbr.domain.message.MessageStatus;
+import br.com.leofonseca.bigchatbr.enums.MessageStatus;
 import br.com.leofonseca.bigchatbr.domain.user.AuthenticationDTO;
 import br.com.leofonseca.bigchatbr.domain.user.LoginResponseDTO;
 import br.com.leofonseca.bigchatbr.repository.ClientRepository;
@@ -19,7 +18,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 

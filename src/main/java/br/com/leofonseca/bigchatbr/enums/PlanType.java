@@ -1,4 +1,4 @@
-package br.com.leofonseca.bigchatbr.domain.client;
+package br.com.leofonseca.bigchatbr.enums;
 
 public enum PlanType {
     PREPAID("PREPAID"),

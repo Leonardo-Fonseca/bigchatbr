@@ -1,4 +1,4 @@
-package br.com.leofonseca.bigchatbr.domain.message;
+package br.com.leofonseca.bigchatbr.enums;
 
 import java.math.BigDecimal;
 

@@ -1,5 +1,6 @@
 package br.com.leofonseca.bigchatbr.service.queue;
 
+import br.com.leofonseca.bigchatbr.queue.MessageQueue;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

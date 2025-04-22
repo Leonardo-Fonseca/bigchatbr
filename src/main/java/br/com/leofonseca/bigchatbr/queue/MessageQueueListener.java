@@ -1,4 +1,4 @@
-package br.com.leofonseca.bigchatbr.service.queue;
+package br.com.leofonseca.bigchatbr.queue;
 
 import br.com.leofonseca.bigchatbr.domain.message.MessageCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;

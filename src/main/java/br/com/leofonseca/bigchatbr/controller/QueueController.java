@@ -1,7 +1,7 @@
 package br.com.leofonseca.bigchatbr.controller;
 
-import br.com.leofonseca.bigchatbr.service.queue.MessageQueue;
-import br.com.leofonseca.bigchatbr.service.queue.QueueStatusDTO;
+import br.com.leofonseca.bigchatbr.queue.MessageQueue;
+import br.com.leofonseca.bigchatbr.queue.QueueStatusDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

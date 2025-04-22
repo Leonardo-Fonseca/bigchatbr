@@ -10,8 +10,6 @@
 
 API para gerenciar um chat, com CRUD, Fila de Mensagens, Autenticaçao, [desse desafio](https://github.com/RocketBus/quero-ser-clickbus/tree/master/testes/backend-developer) para desenvolvedores que se candidatam para a Irrah Tech.
 
-Perfil de desafio escolhido: Back-End
-
 ## Tecnologias
 
 - [Spring Boot](https://spring.io/projects/spring-boot)

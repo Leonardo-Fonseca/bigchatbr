@@ -1,6 +1,9 @@
 package br.com.leofonseca.bigchatbr.controller;
 
 import br.com.leofonseca.bigchatbr.domain.client.ClientResponseDTO;
+import br.com.leofonseca.bigchatbr.domain.user.AuthenticationDTO;
+import br.com.leofonseca.bigchatbr.domain.user.LoginResponseDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +25,28 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class ClientControllerIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
+    private String token;
+
+    @BeforeEach
+    void setup() {
+        // Longing como admin para obter o token
+        // Endpoints Clientes não estão disponíveis para o usuário comum.
+        var loginDto = new AuthenticationDTO("10708787908", "leo");
+        var loginResponse = webTestClient.post().uri("/auth/login")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoginResponseDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        this.token = loginResponse.token();
+
+        this.webTestClient = webTestClient.mutate()
+                .defaultHeader("Authorization", "Bearer " + this.token)
+                .build();
+    }
 
     @Test
     void createClient_success() throws IOException {

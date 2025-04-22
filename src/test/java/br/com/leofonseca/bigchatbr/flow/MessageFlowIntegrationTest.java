@@ -5,6 +5,8 @@ import br.com.leofonseca.bigchatbr.domain.conversation.ConversationResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageRequestDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageStatus;
+import br.com.leofonseca.bigchatbr.domain.user.AuthenticationDTO;
+import br.com.leofonseca.bigchatbr.domain.user.LoginResponseDTO;
 import br.com.leofonseca.bigchatbr.repository.ClientRepository;
 import br.com.leofonseca.bigchatbr.repository.ConversationRepository;
 import br.com.leofonseca.bigchatbr.repository.MessageRepository;
@@ -22,6 +24,7 @@ import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -36,7 +39,9 @@ public class MessageFlowIntegrationTest {
     @Autowired
     private MessageRepository msgRepo;
 
-    private Long senderId, recipientId;
+    private Long senderId;
+    private Long recipientId = 2L;
+    private String token;
 
     @BeforeEach
     void cleanupAndSetup() {
@@ -44,22 +49,22 @@ public class MessageFlowIntegrationTest {
         msgRepo.deleteAll();
         convRepo.deleteAll();
 
-        // cria dois clientes de teste
-        Client sender = new Client();
-        sender.setName("Remetente");
-        sender.setPlanType("PREPAID");
-        sender.setBalance(BigDecimal.valueOf(50));
-        sender.setInvoice(BigDecimal.ZERO);
-        clientRepo.save(sender);
-        senderId = sender.getId();
+        // Login como usuario
+        var loginDto = new AuthenticationDTO("11122233344", "leo");
+        var loginResponse = webTestClient.post().uri("/auth/login")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoginResponseDTO.class)
+                .returnResult()
+                .getResponseBody();
 
-        Client recipient = new Client();
-        recipient.setName("Destinatário");
-        recipient.setPlanType("PREPAID");
-        recipient.setBalance(BigDecimal.ZERO);
-        recipient.setInvoice(BigDecimal.ZERO);
-        clientRepo.save(recipient);
-        recipientId = recipient.getId();
+        this.token = loginResponse.token();
+
+        this.webTestClient = webTestClient.mutate()
+                .defaultHeader("Authorization", "Bearer " + this.token)
+                .build();
     }
 
     @Test
@@ -68,7 +73,6 @@ public class MessageFlowIntegrationTest {
         // 1) Criação da mensagem → status inicial QUEUED
         MessageRequestDTO req = new MessageRequestDTO(
                 null,
-                senderId,
                 recipientId,
                 "Fluxo completo",
                 "NORMAL"

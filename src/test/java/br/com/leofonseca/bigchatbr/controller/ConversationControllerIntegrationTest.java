@@ -2,12 +2,17 @@ package br.com.leofonseca.bigchatbr.controller;
 
 import br.com.leofonseca.bigchatbr.domain.conversation.ConversationResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
+import br.com.leofonseca.bigchatbr.domain.user.AuthenticationDTO;
+import br.com.leofonseca.bigchatbr.domain.user.LoginResponseDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -17,6 +22,29 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 public class ConversationControllerIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
+    private String token;
+
+    @BeforeEach
+    void setup() {
+        // Longing como cliente para obter o token
+        // Endpoints de Conversas estao disponiveis para todos os usuarios.
+        var loginDto = new AuthenticationDTO("11122233344", "leo");
+        var loginResponse = webTestClient.post().uri("/auth/login")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoginResponseDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        this.token = loginResponse.token();
+
+        this.webTestClient = webTestClient.mutate()
+                .defaultHeader("Authorization", "Bearer " + this.token)
+                .build();
+    }
+
 
     @Test
     void listConversations_success() {

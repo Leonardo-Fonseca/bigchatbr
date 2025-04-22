@@ -2,6 +2,9 @@ package br.com.leofonseca.bigchatbr.controller;
 
 import br.com.leofonseca.bigchatbr.domain.message.MessageResponseDTO;
 import br.com.leofonseca.bigchatbr.domain.message.MessageStatus;
+import br.com.leofonseca.bigchatbr.domain.user.AuthenticationDTO;
+import br.com.leofonseca.bigchatbr.domain.user.LoginResponseDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,13 +26,34 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class MessageControllerIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
+    private String token;
+
+    @BeforeEach
+    void setup() {
+        // Login como usuario comum
+        var loginDto = new AuthenticationDTO("11122233344", "leo");
+        var loginResponse = webTestClient.post().uri("/auth/login")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoginResponseDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        this.token = loginResponse.token();
+
+        this.webTestClient = webTestClient.mutate()
+                .defaultHeader("Authorization", "Bearer " + this.token)
+                .build();
+
+    }
 
     @Test
     void createMessage_success() throws IOException {
-        /* {
+        /** {
                 "conversationId": 1,
-                "senderId": 2,
-                "recipientId": 1,
+                "recipientId": 2,
                 "content": "Mensagem de teste automatizada",
                 "priority": "URGENT",
                 "status": "SENT"
@@ -45,16 +69,37 @@ public class MessageControllerIntegrationTest {
                 .jsonPath("$.content").isEqualTo("Mensagem de teste automatizada")
                 .jsonPath("$.priority").isEqualTo("URGENT");
 
-        // Apos isso teste para verificar se o balance e o invoice foram atualizados corretamente.
-        // sender id = 2 name = Company LTDA Balance inicial = 200.00 Invoice = 0 custo = 0.50
-        webTestClient.get().uri("/clientes/{id}", 2)
+        /**
+         *  Segundo login agora como ADMIN, pois para verificar o saldo do cliente após o envio da mensagem.
+         *  e nessecessario ser ADMIN ja que a /clientes so pode ser acessada por ADMIN
+         */
+        var loginDtoAdmin = new AuthenticationDTO("10708787908", "leo");
+        var loginResponseAdmin = webTestClient.post().uri("/auth/login")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(loginDtoAdmin)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoginResponseDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        this.token = loginResponseAdmin.token();
+
+        this.webTestClient = webTestClient.mutate()
+                .defaultHeader("Authorization", "Bearer " + this.token)
+                .build();
+
+        /**
+         *  Apos o login e verificado o saldo do cliente para conferir se houve alteraçao pelo envio da mensagem.
+         */
+        webTestClient.get().uri("/clientes/{id}", 1)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(2)
-                .jsonPath("$.name").isEqualTo("Company LTDA")
-                .jsonPath("$.balance").isEqualTo(199.50)
-                .jsonPath("$.invoice").isEqualTo(0.50);
+                .jsonPath("$.id").isEqualTo(1)
+                .jsonPath("$.name").isEqualTo("Jose Souza")
+                .jsonPath("$.balance").isEqualTo(99.50)
+                .jsonPath("$.invoice").isEqualTo(0);
     }
 
     @Test
